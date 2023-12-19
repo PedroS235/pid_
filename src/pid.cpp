@@ -16,15 +16,8 @@ PID::PID(float kp, float ki, float kd, float min_output, float max_output) {
     _setpoint = 0;
 }
 
-void PID::set_pid_gains(pid_gains_t pid_gains) {
-    _pid_gains = pid_gains;
-
-    _check_pid_gains(_pid_gains);
-}
-void PID::set_pid_gains(float kp, float ki, float kd) {
-    _pid_gains = {kp, ki, kd};
-    _check_pid_gains(_pid_gains);
-}
+void PID::set_pid_gains(pid_gains_t pid_gains) { _pid_gains = pid_gains; }
+void PID::set_pid_gains(float kp, float ki, float kd) { _pid_gains = {kp, ki, kd}; }
 
 void PID::set_output_limits(output_limits_t output_limits) {
     _output_limits = output_limits;
@@ -92,16 +85,6 @@ bool PID::_check_output_limits(output_limits_t &output_limits) {
         float temp = output_limits.max_output;
         output_limits.max_output = output_limits.min_output;
         output_limits.min_output = temp;
-        return true;
-    }
-    return false;
-}
-
-bool PID::_check_pid_gains(pid_gains_t &pid_gains) {
-    if (pid_gains.kp < 0 || pid_gains.ki < 0 || pid_gains.kd < 0) {
-        pid_gains.kp = pid_gains.kp < 0 ? -pid_gains.kp : pid_gains.kp;
-        pid_gains.ki = pid_gains.ki < 0 ? -pid_gains.ki : pid_gains.ki;
-        pid_gains.kd = pid_gains.kd < 0 ? -pid_gains.kd : pid_gains.kd;
         return true;
     }
     return false;
