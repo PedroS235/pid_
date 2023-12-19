@@ -1,0 +1,17 @@
+{
+  "name": "PID",
+  "version": "1.0.0",
+  "description": "A simple implementation of a PID controller",
+  "authors": [
+    {
+      "name": "Pedro Soares",
+      "email": "pmbs.123@gmail.com"
+    }
+  ],
+  "keywords": ["utility", "pid", "controller"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PedroS235/pid_controller_cpp"
+  },
+  "dependencies": []
+}
