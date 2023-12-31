@@ -58,16 +58,17 @@ float PID::compute(float measured_value) {
 
     const float error = _setpoint - measured_value;
 
-    _error_sum = _bound_value(
-        _error_sum + error, _output_limits.min_output, _output_limits.max_output);
+    _error_sum = _bound_value(_error_sum + error, min_output, max_output);
 
     const float p = kp * error;
     const float i = ki * _error_sum;
     const float d = kd * (error - _prev_error);
 
     float correction = p + i + d;
-    return _bound_value(
-        correction, _output_limits.min_output, _output_limits.max_output);
+
+    _prev_error = error;
+
+    return _bound_value(correction, min_output, max_output);
 }
 
 float PID::_bound_value(float value, float min_value, float max_value) {
