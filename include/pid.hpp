@@ -1,6 +1,8 @@
 #ifndef PID_HPP
 #define PID_HPP
 
+#include <TimerAPI.hpp>
+
 /*
  * @brief PID gains structure
  *
@@ -35,6 +37,8 @@ class PID {
     pid_gains_t _pid_gains;
     output_limits_t _output_limits;
     float _error_sum, _prev_error, _setpoint;
+    TimerAPI *_timer = nullptr;
+    float _prev_correction;
 
    public:
     /*
@@ -42,8 +46,12 @@ class PID {
      *
      * @param pid_gains PID gains structure
      * @param output_limits Output limits structure
+     * @param rate Rate (in Hz) at which the new correction if computed. If set to 0,
+     * the correction is computed at every call of the compute method.
      */
-    PID(pid_gains_t pid_gains, output_limits_t output_limits = {0, 255});
+    PID(pid_gains_t pid_gains,
+        output_limits_t output_limits = {0, 255},
+        uint8_t rate = 20);
     /*
      * @brief PID class constructor
      *
@@ -52,8 +60,15 @@ class PID {
      * @param kd Derivative gain
      * @param min_output Minimum output value for PID correction
      * @param max_output Maximum output value for PID correction
+     * @param rate Rate (in Hz) at which the new correction if computed. If set to 0,
+     * the correction is computed at every call of the compute method.
      */
-    PID(float kp, float ki, float kd, float min_output = 0, float max_output = 255);
+    PID(float kp,
+        float ki,
+        float kd,
+        float min_output = 0,
+        float max_output = 255,
+        uint8_t rate = 20);
 
     /*
      * @brief Setter for output limits
@@ -97,24 +112,6 @@ class PID {
      * @return PID gains structure
      */
     pid_gains_t get_pid_gains(void);
-    /*
-     * @brief Getter for PID gains
-     *
-     * @return Proportional gain
-     */
-    float get_p_gain(void);
-    /*
-     * @brief Getter for PID gains
-     *
-     * @return Integral gain
-     */
-    float get_i_gain(void);
-    /*
-     * @brief Getter for PID gains
-     *
-     * @return Derivative gain
-     */
-    float get_d_gain(void);
 
     /*
      * @brief Getter for output limits
@@ -122,18 +119,6 @@ class PID {
      * @return Output limits structure
      */
     output_limits_t get_output_limits(void);
-    /*
-     * @brief Getter for output limits
-     *
-     * @return Minimum output value for PID correction
-     */
-    float get_min_output_limit(void);
-    /*
-     * @brief Getter for output limits
-     *
-     * @return Maximum output value for PID correction
-     */
-    float get_max_output_limit(void);
 
     /*
      * @brief Getter for setpoint
@@ -166,7 +151,6 @@ class PID {
      */
     float _bound_value(float value, float min_value, float max_value);
     bool _check_output_limits(output_limits_t &output_limits);
-    bool _check_pid_gains(pid_gains_t &pid_gains);
 };
 
 #endif  // !PID_HPP

@@ -1,19 +1,36 @@
 #include "pid.hpp"
 
-PID::PID(pid_gains_t pid_gains, output_limits_t output_limits) {
+PID::PID(pid_gains_t pid_gains, output_limits_t output_limits, uint8_t rate) {
     _pid_gains = pid_gains;
     _output_limits = output_limits;
     _error_sum = 0;
     _prev_error = 0;
     _setpoint = 0;
+    _prev_correction = 0;
+
+    if (rate > 0) {
+        _timer = new TimerAPI((1 / rate) * 1000);
+        _timer->start();
+    }
 }
 
-PID::PID(float kp, float ki, float kd, float min_output, float max_output) {
+PID::PID(float kp,
+         float ki,
+         float kd,
+         float min_output,
+         float max_output,
+         uint8_t rate) {
     _pid_gains = {kp, ki, kd};
     _output_limits = {min_output, max_output};
     _error_sum = 0;
     _prev_error = 0;
     _setpoint = 0;
+    _prev_correction = 0;
+
+    if (rate > 0) {
+        _timer = new TimerAPI((1 / rate) * 1000);
+        _timer->start();
+    }
 }
 
 void PID::set_pid_gains(pid_gains_t pid_gains) { _pid_gains = pid_gains; }
@@ -34,13 +51,8 @@ void PID::set_setpoint(float setpoint) {
 }
 
 pid_gains_t PID::get_pid_gains() { return _pid_gains; }
-float PID::get_p_gain() { return _pid_gains.kp; }
-float PID::get_i_gain() { return _pid_gains.ki; }
-float PID::get_d_gain() { return _pid_gains.kd; }
 
 output_limits_t PID::get_output_limits() { return _output_limits; }
-float PID::get_min_output_limit() { return _output_limits.min_output; }
-float PID::get_max_output_limit() { return _output_limits.max_output; }
 
 float PID::get_setpoint() { return _setpoint; }
 
@@ -50,6 +62,9 @@ void PID::reset() {
 }
 
 float PID::compute(float measured_value) {
+    if (_timer != nullptr && !_timer->has_elapsed()) {
+        return _prev_correction;
+    }
     const float kp = _pid_gains.kp;
     const float ki = _pid_gains.ki;
     const float kd = _pid_gains.kd;
@@ -64,11 +79,12 @@ float PID::compute(float measured_value) {
     const float i = ki * _error_sum;
     const float d = kd * (error - _prev_error);
 
-    float correction = p + i + d;
+    float correction = _bound_value(p + i + d, min_output, max_output);
 
+    _prev_correction = correction;
     _prev_error = error;
 
-    return _bound_value(correction, min_output, max_output);
+    return correction;
 }
 
 float PID::_bound_value(float value, float min_value, float max_value) {
