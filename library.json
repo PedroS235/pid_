@@ -13,5 +13,10 @@
     "type": "git",
     "url": "https://github.com/PedroS235/pid_controller_cpp"
   },
-  "dependencies": ["https://github.com/PedroS235/timer_api"]
+  "dependencies": [
+    {
+      "name": "Timer API",
+      "version": "https://github.com/PedroS235/timer_api#v1.0.1"
+    }
+  ]
 }
