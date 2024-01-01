@@ -1,7 +1,7 @@
 #ifndef PID_HPP
 #define PID_HPP
 
-#include <TimerAPI.hpp>
+#include "timer_api.hpp"
 
 /*
  * @brief PID gains structure
