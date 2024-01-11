@@ -151,6 +151,13 @@ class PID {
      * @return Bounded value
      */
     float _bound_value(float value, float min_value, float max_value);
+
+    /*
+     * @brief Checks if the output limits are valid
+     *
+     * @param output_limits Output limits structure
+     * @return True if the output limits are valid, false otherwise
+     */
     bool _check_output_limits(output_limits_t &output_limits);
 };
 
