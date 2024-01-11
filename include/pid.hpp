@@ -45,9 +45,9 @@ class PID {
      * @brief PID class constructor
      *
      * @param pid_gains PID gains structure
-     * @param output_limits Output limits structure
-     * @param rate Rate (in Hz) at which the new correction if computed. If set to 0,
-     * the correction is computed at every call of the compute method.
+     * @param output_limits Output limits structure. [Default: (0-255)]
+     * @param rate Rate (in Hz) at which the new correction is computed. If set to 0,
+     * the correction is computed at every call of the compute method. [Default: 20Hz]
      */
     PID(pid_gains_t pid_gains,
         output_limits_t output_limits = {0, 255},
@@ -58,10 +58,10 @@ class PID {
      * @param kp Proportional gain
      * @param ki Integral gain
      * @param kd Derivative gain
-     * @param min_output Minimum output value for PID correction
-     * @param max_output Maximum output value for PID correction
-     * @param rate Rate (in Hz) at which the new correction if computed. If set to 0,
-     * the correction is computed at every call of the compute method.
+     * @param min_output Minimum output value for PID correction. [Default: 0]
+     * @param max_output Maximum output value for PID correction. [Default: 255]
+     * @param rate Rate (in Hz) at which the new correction is computed. If set to 0,
+     * the correction is computed at every call of the compute method. [Default: 20Hz]
      */
     PID(float kp,
         float ki,
