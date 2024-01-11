@@ -59,6 +59,7 @@ float PID::get_setpoint() { return _setpoint; }
 void PID::reset() {
     _error_sum = 0;
     _prev_error = 0;
+    if (_timer != nullptr) _timer->reset();
 }
 
 float PID::compute(float measured_value) {
@@ -72,6 +73,11 @@ float PID::compute(float measured_value) {
     const float max_output = _output_limits.max_output;
 
     const float error = _setpoint - measured_value;
+
+    // Eliminate possible noise on the integral term.
+    if (error == 0 && _setpoint == 0) {
+        reset();
+    }
 
     _error_sum = _bound_value(_error_sum + error, min_output, max_output);
 
