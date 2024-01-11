@@ -103,8 +103,9 @@ class PID {
      * @brief Setter for setpoint
      *
      * @param setpoint Setpoint value
+     * @param reset If true, the PID controller is reset. [Default: false]
      */
-    void set_setpoint(float setpoint);
+    void set_setpoint(float setpoint, bool reset = false);
 
     /*
      * @brief Getter for PID gains

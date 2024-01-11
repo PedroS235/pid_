@@ -45,9 +45,9 @@ void PID::set_output_limits(float min_output, float max_output) {
     _check_output_limits(_output_limits);
 }
 
-void PID::set_setpoint(float setpoint) {
+void PID::set_setpoint(float setpoint, bool reset) {
     _setpoint = setpoint;
-    reset();
+    if (reset) this->reset();
 }
 
 pid_gains_t PID::get_pid_gains() { return _pid_gains; }
