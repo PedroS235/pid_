@@ -25,6 +25,8 @@ typedef struct {
 typedef struct {
     float min_output;
     float max_output;
+    float min_i_output;
+    float max_i_output;
 } output_limits_t;
 
 /*
@@ -50,7 +52,7 @@ class PID {
      * the correction is computed at every call of the compute method. [Default: 0Hz]
      */
     PID(pid_gains_t pid_gains,
-        output_limits_t output_limits = {0, 255},
+        output_limits_t output_limits = {0, 255, 0, 125},
         uint8_t rate = 0);
     /*
      * @brief PID class constructor
@@ -60,6 +62,8 @@ class PID {
      * @param kd Derivative gain
      * @param min_output Minimum output value for PID correction. [Default: 0]
      * @param max_output Maximum output value for PID correction. [Default: 255]
+     * @param min_i_output Minimum output value for integral correction. [Default: 0]
+     * @param max_i_output Maximum output value for integral correction. [Default: 125]
      * @param rate Rate (in Hz) at which the new correction is computed. If set to 0,
      * the correction is computed at every call of the compute method. [Default: 0Hz]
      */
@@ -68,6 +72,8 @@ class PID {
         float kd,
         float min_output = 0,
         float max_output = 255,
+        float min_i_output = 0,
+        float max_i_output = 125,
         uint8_t rate = 0);
 
     /*
@@ -83,6 +89,14 @@ class PID {
      * @param max_output Maximum output value for PID correction
      */
     void set_output_limits(float min_output, float max_output);
+
+    /*
+     * @brief Setter for integral output limits
+     *
+     * @param min_i_output Minimum output value for integral correction
+     * @param max_i_output Maximum output value for integral correction
+     */
+    void set_integral_limits(float min_i_output, float max_i_output);
 
     /*
      * @brief Setter for PID gains

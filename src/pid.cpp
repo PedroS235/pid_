@@ -19,9 +19,11 @@ PID::PID(float kp,
          float kd,
          float min_output,
          float max_output,
+         float min_i_output,
+         float max_i_output,
          uint8_t rate) {
     _pid_gains = {kp, ki, kd};
-    _output_limits = {min_output, max_output};
+    _output_limits = {min_output, max_output, min_i_output, max_i_output};
     _error_sum = 0;
     _prev_error = 0;
     _setpoint = 0;
@@ -40,8 +42,16 @@ void PID::set_output_limits(output_limits_t output_limits) {
     _output_limits = output_limits;
     _check_output_limits(_output_limits);
 }
+
 void PID::set_output_limits(float min_output, float max_output) {
-    _output_limits = {min_output, max_output};
+    _output_limits.min_output = min_output;
+    _output_limits.max_output = max_output;
+    _check_output_limits(_output_limits);
+}
+
+void PID::set_integral_limits(float min_i_output, float max_i_output) {
+    _output_limits.min_i_output = min_i_output;
+    _output_limits.max_i_output = max_i_output;
     _check_output_limits(_output_limits);
 }
 
@@ -71,6 +81,8 @@ float PID::compute(float measured_value) {
     const float kd = _pid_gains.kd;
     const float min_output = _output_limits.min_output;
     const float max_output = _output_limits.max_output;
+    const float min_i_output = _output_limits.min_i_output;
+    const float max_i_output = _output_limits.max_i_output;
 
     const float error = _setpoint - measured_value;
 
@@ -79,7 +91,8 @@ float PID::compute(float measured_value) {
         reset();
     }
 
-    _error_sum = _bound_value(_error_sum + error, min_output, max_output);
+    // Integral Anti-windup
+    _error_sum = _bound_value(_error_sum + error, min_i_output, max_i_output);
 
     const float p = kp * error;
     const float i = ki * _error_sum;
@@ -100,15 +113,20 @@ float PID::_bound_value(float value, float min_value, float max_value) {
         return min_value;
     else
         return value;
-    ;
 }
 
-bool PID::_check_output_limits(output_limits_t &output_limits) {
+bool PID::_check_output_limits(output_limits_t& output_limits) {
     if (output_limits.min_output > output_limits.max_output) {
         float temp = output_limits.max_output;
         output_limits.max_output = output_limits.min_output;
         output_limits.min_output = temp;
-        return true;
     }
-    return false;
+
+    if (output_limits.min_i_output > output_limits.max_i_output) {
+        float temp = output_limits.max_i_output;
+        output_limits.max_i_output = output_limits.min_i_output;
+        output_limits.min_i_output = temp;
+    }
+
+    return true;
 }
